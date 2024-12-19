@@ -1,14 +1,14 @@
 repos:
   # Black: code formatter
   - repo: https://github.com/psf/black
-    rev: 23.9.1  # Use the latest stable version
+    rev: 24.10.0  # Use the latest stable version
     hooks:
       - id: black
-        args: ["--check"]
+        args: ["--line-length=79"]
 
   # Flake8: code linting
   - repo: https://github.com/pycqa/flake8
-    rev: 6.1.0  # Use the latest stable version
+    rev: 7.1.1  # Use the latest stable version
     hooks:
       - id: flake8
 
@@ -17,30 +17,31 @@ repos:
     hooks:
       - id: pytest
         name: pytest
-        entry: pytest
+        entry: pytest tests
         language: system
-        types: [python]
+        types: [ python ]
+        args: ["--maxfail=1", "--disable-warnings", "--verbose"]
 
   # End-of-file fixer: ensures files end with a single newline
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v5.0.0
     hooks:
       - id: end-of-file-fixer
 
   # Trim trailing whitespace
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
 
   # Check YAML syntax
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v5.0.0
     hooks:
       - id: check-yaml
 
   # Check for added large files
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v5.0.0
     hooks:
       - id: detect-private-key
