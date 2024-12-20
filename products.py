@@ -2,9 +2,9 @@ class Product:
     def __init__(
         self, name: str, price: float, quantity: int, active: bool = True
     ) -> None:
-        Product.validate_name(name)
-        Product.validate_price(price)
-        Product.validate_quantity(quantity)
+        Product._validate_name(name)
+        Product._validate_price(price)
+        Product._validate_quantity(quantity)
 
         self.name = name
         self.price = round(float(price), 2)
@@ -30,26 +30,26 @@ class Product:
         return f"{self.name} - {self.price} - {self.quantity} - {self.active}"
 
     def buy(self, quantity: int) -> float:
-        self.validate_quantity(quantity)
+        self._validate_quantity(quantity)
         if self.quantity < quantity:
             raise ValueError("Not enough quantity")
         self.quantity -= quantity
         return round(self.price * self.quantity, 2)
 
     @staticmethod
-    def validate_name(name: str) -> bool:
+    def _validate_name(name: str) -> bool:
         if not isinstance(name, str) or len(name) == 0:
             raise ValueError("Name should be a string and not empty")
         return True
 
     @staticmethod
-    def validate_price(price: float) -> bool:
+    def _validate_price(price: float) -> bool:
         if not isinstance(price, (float, int)) or price <= 0:
             raise ValueError("Price should be a positive float")
         return True
 
     @staticmethod
-    def validate_quantity(quantity: int) -> bool:
+    def _validate_quantity(quantity: int) -> bool:
         if not isinstance(quantity, int) or quantity <= 0:
             raise ValueError("Quantity should be a positive integer")
         return True
