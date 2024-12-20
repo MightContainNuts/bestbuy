@@ -2,19 +2,46 @@ from products import Product
 
 
 class Store:
+    """
+    Store class
+    """
 
     def __init__(self, products: list[Product] = None) -> None:
+        """
+        initialise store with products
+        :param products:
+        :type products:
+        """
         self.products = products if products else []
 
     def add_product(self, product: Product) -> None:
+        """
+        add product to store
+        :param product:
+        :type product:
+        :return:
+        :rtype:
+        """
         if not isinstance(product, Product):
             raise ValueError("Product should be an instance of Product")
         self.products.append(product)
 
     def remove_product(self, product: Product) -> None:
+        """
+        remove product from store
+        :param product:
+        :type product:
+        :return:
+        :rtype:
+        """
         self.products.remove(product)
 
     def get_total_quantity(self) -> int:
+        """
+        get total quantity of products in store
+        :return:
+        :rtype:
+        """
         total = sum([product.quantity for product in self.products])
         print("\nQuantity of products in store:")
         print("-" * 30)
@@ -23,6 +50,11 @@ class Store:
         return total
 
     def get_all_products(self) -> list[Product]:
+        """
+        get all products in store
+        :return:
+        :rtype:
+        """
         print("\n All products in store:")
         print("-" * 30)
         for idx, product in enumerate(self.products):
@@ -31,6 +63,11 @@ class Store:
         return self.products
 
     def make_an_order(self) -> list[tuple[Product, int]]:
+        """
+        make an order
+        :return:
+        :rtype:
+        """
         shopping_list = []
         print("Enter the product name and quantity to order")
         while True:
@@ -60,6 +97,13 @@ class Store:
         return shopping_list
 
     def order(self, shopping_list: list[tuple[Product, int]]) -> float:
+        """
+        finalise order and print summary
+        :param shopping_list:
+        :type shopping_list:
+        :return:
+        :rtype:
+        """
         print("\nOrder summary:")
         print("-" * 30)
 
