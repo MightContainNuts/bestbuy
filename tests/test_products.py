@@ -81,6 +81,10 @@ def test_product_instance_with_invalid_quantity():
         Product(name="Product", price=10.0, quantity="")
 
 
+def test_is_active(test_product_instance):
+    assert test_product_instance.is_active(), "The product should be active"
+
+
 def test_get_quantity(test_product_instance):
     assert (
         test_product_instance.get_quantity() == 10
@@ -89,7 +93,7 @@ def test_get_quantity(test_product_instance):
 
 def test_set_quantity(test_product_instance):
     assert (
-        test_product_instance.get_quantity() == 10
+        test_product_instance.set_quantity(10) == 10
     ), "The quantity should be 10"
 
 

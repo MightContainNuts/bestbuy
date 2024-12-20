@@ -14,8 +14,9 @@ class Product:
     def get_quantity(self) -> int:
         return self.quantity
 
-    def set_quantity(self, quantity: int) -> None:
+    def set_quantity(self, quantity: int) -> int:
         self.quantity = quantity
+        return self.quantity
 
     def is_active(self) -> bool:
         return self.active
