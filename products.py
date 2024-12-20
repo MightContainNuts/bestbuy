@@ -28,7 +28,7 @@ class Product:
         self.active = False
 
     def show(self) -> str:
-        return f"{self.name} - {self.price} - {self.quantity} - {self.active}"
+        return f"{self.name} - {str(self.price)} - {self.quantity}"
 
     def buy(self, quantity: int) -> float:
         self._validate_quantity(quantity)

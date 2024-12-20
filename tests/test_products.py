@@ -123,7 +123,7 @@ def test_product_activate(test_product_instance):
 
 def test_show(test_product_instance):
     assert (
-        test_product_instance.show() == "Product - 10.0 - 10 - True"
+        test_product_instance.show() == "Product - 10.0 - 10"
     ), "The product should be Product - 10.0 - 10 - True"
 
 

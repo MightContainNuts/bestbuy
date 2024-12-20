@@ -72,6 +72,6 @@ def test_order_not_enough_stock(test_store, test_product_1, test_product_2):
     test_store.products = [test_product_1, test_product_2]
     with pytest.raises(
         ValueError,
-        match="Not enough quantity or product not found: MacBook Air M2",
+        match="Unsuficient quantity in stock",
     ):
         test_store.order([(test_product_1, 101)])
