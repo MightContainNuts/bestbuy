@@ -68,10 +68,13 @@ def test_order(test_store, test_product_1, test_product_2):
     assert test_store.order([(test_product_1, 1), (test_product_2, 2)]) == 1950
 
 
-def test_order_not_enough_stock(test_store, test_product_1, test_product_2):
+def test_order_not_enough_stock(
+    test_store, test_product_1, test_product_2, capfd
+):
     test_store.products = [test_product_1, test_product_2]
-    with pytest.raises(
-        ValueError,
-        match="Unsuficient quantity in stock",
-    ):
-        test_store.order([(test_product_1, 101)])
+    shopping_list = [(test_product_1, 10), (test_product_2, 600)]
+    test_store.order(shopping_list)
+    captured = capfd.readouterr()
+    assert "Error: Unsufficient qty for" in captured.out
+    assert "Available: 500, Requested: 600" in captured.out
+    assert "Total: 14500" in captured.out
