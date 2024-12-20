@@ -125,7 +125,8 @@ class Store:
                     )
                 else:
                     print(
-                        f"Error: Not enough quantity for {product.name}. Available: {found_product.quantity}, Requested: {basket_quantity}"  # noqa E501
+                        f"Error: Unsufficient qty for {product.name}. "
+                        f"Available: {found_product.quantity}, Requested: {basket_quantity}"  # noqa E501
                     )
                     raise ValueError("Unsuficient quantity in stock")
 
