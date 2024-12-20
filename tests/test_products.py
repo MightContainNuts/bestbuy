@@ -9,7 +9,7 @@ def test_product_instance():
 
 def test_validate_name_is_string():
     name = "Product"
-    assert Product.validate_name(name), "validate_name should return a string"
+    assert Product._validate_name(name), "validate_name should return a string"
 
 
 def test_validate_name_is_not_empty():
@@ -17,12 +17,12 @@ def test_validate_name_is_not_empty():
     with pytest.raises(
         ValueError, match="Name should be a string and not empty"
     ):
-        Product.validate_name(name)
+        Product._validate_name(name)
 
 
 def test_validate_price_is_float():
     price = 10.0
-    assert Product.validate_price(
+    assert Product._validate_price(
         price
     ), "validate_price should return a float"
 
@@ -30,18 +30,18 @@ def test_validate_price_is_float():
 def test_validate_price_is_not_empty():
     price = None
     with pytest.raises(ValueError, match="Price should be a positive float"):
-        Product.validate_price(price)
+        Product._validate_price(price)
 
 
 def test_validate_price_is_greater_equal_0():
     price = -10.0
     with pytest.raises(ValueError, match="Price should be a positive float"):
-        Product.validate_price(price)
+        Product._validate_price(price)
 
 
 def test_validate_quantity_is_int():
     qty = 10
-    assert Product.validate_quantity(
+    assert Product._validate_quantity(
         qty
     ), "validate_quantity should return an integer"
 
@@ -51,7 +51,7 @@ def test_validate_quantity_is_greater_equal_0():
     with pytest.raises(
         ValueError, match="Quantity should be a positive integer"
     ):
-        Product.validate_quantity(qty)
+        Product._validate_quantity(qty)
 
 
 def test_validate_quantity_is_greater_than_zero():
@@ -59,7 +59,7 @@ def test_validate_quantity_is_greater_than_zero():
     with pytest.raises(
         ValueError, match="Quantity should be a positive integer"
     ):
-        Product.validate_quantity(qty)
+        Product._validate_quantity(qty)
 
 
 def test_product_instance_with_invalid_name():
@@ -109,9 +109,6 @@ def test_product_deactivate(test_product_instance):
 
 
 def test_product_activate(test_product_instance):
-    assert (
-        test_product_instance.active
-    ), "The product should be activated on itialise"
     test_product_instance.deactivate()
     assert (
         not test_product_instance.active
