@@ -73,7 +73,7 @@ class Product:
         """
         return f"{self.name} - {str(self.price)} - {self.quantity}"
 
-    def buy(self, quantity: int) -> float:
+    def buy(self, quantity_to_buy: int) -> float:
         """
         buy the product
         :param quantity:
@@ -81,11 +81,11 @@ class Product:
         :return:
         :rtype:
         """
-        self._validate_quantity(quantity)
-        if self.quantity < quantity:
+        self._validate_quantity(quantity_to_buy)
+        if self.quantity < quantity_to_buy:
             raise ValueError("Not enough quantity")
-        self.quantity -= quantity
-        return round(self.price * self.quantity, 2)
+        self.quantity -= quantity_to_buy
+        return round(self.price * quantity_to_buy, 2)
 
     @staticmethod
     def _validate_name(name: str) -> bool:

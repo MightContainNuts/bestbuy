@@ -43,10 +43,6 @@ class Store:
         :rtype:
         """
         total = sum([product.quantity for product in self.products])
-        print("\nQuantity of products in store:")
-        print("-" * 30)
-        print(f"Total quantity: {total}")
-        print("-" * 30 + "\n")
         return total
 
     def get_all_products(self) -> list[Product]:
@@ -55,11 +51,6 @@ class Store:
         :return:
         :rtype:
         """
-        print("\n All products in store:")
-        print("-" * 30)
-        for idx, product in enumerate(self.products):
-            print(f"{idx + 1}:", product.show())
-        print("-" * 30 + "\n")
         return self.products
 
     def make_an_order(self) -> list[tuple[Product, int]]:
