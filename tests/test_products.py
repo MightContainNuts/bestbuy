@@ -82,43 +82,44 @@ def test_product_instance_with_invalid_quantity():
 
 
 def test_is_active(test_product_instance):
-    assert test_product_instance.is_active(), "The product should be active"
+    assert test_product_instance.is_active, "The product should be active"
 
 
 def test_get_quantity(test_product_instance):
     assert (
-        test_product_instance.get_quantity() == 10
+        test_product_instance.product_quantity == 10
     ), "The quantity should be 10"
 
 
 def test_set_quantity(test_product_instance):
+    test_product_instance.product_quantity = 10
     assert (
-        test_product_instance.set_quantity(10) == 10
+        test_product_instance.product_quantity == 10
     ), "The quantity should be 10"
 
 
 def test_is_active_on_initialise(test_product_instance):
     test_prod = test_product_instance
-    assert test_prod.active, "The product should be active"
+    assert test_prod._active, "The product should be active"
 
 
 def test_product_deactivate(test_product_instance):
     assert (
-        test_product_instance.active
+        test_product_instance._active
     ), "The product should be activated on initialise"
     test_product_instance.deactivate()
     assert (
-        not test_product_instance.active
+        not test_product_instance._active
     ), "The product should be deactivated"
 
 
 def test_product_activate(test_product_instance):
     test_product_instance.deactivate()
     assert (
-        not test_product_instance.active
+        not test_product_instance._active
     ), "The product should be deactivated"
     test_product_instance.activate()
-    assert test_product_instance.active, "The product should be activated"
+    assert test_product_instance._active, "The product should be activated"
 
 
 def test_show(test_product_instance):
@@ -130,10 +131,14 @@ def test_show(test_product_instance):
 def test_buy(test_product_instance):
     test_buy = test_product_instance.buy(5)
     assert test_buy == 50.0, "The total price should be 50.0"
-    assert test_product_instance.quantity == 5, "The quantity should be 5"
+    assert (
+        test_product_instance.product_quantity == 5
+    ), "The _quantity should be 5"
 
 
 def test_buy_with_invalid_quantity(test_product_instance):
-    with pytest.raises(ValueError, match="Not enough quantity"):
+    with pytest.raises(ValueError, match="Not enough _quantity"):
         test_product_instance.buy(15)
-    assert test_product_instance.quantity == 10, "The quantity should be 10"
+    assert (
+        test_product_instance.product_quantity == 10
+    ), "The _quantity should be 10"

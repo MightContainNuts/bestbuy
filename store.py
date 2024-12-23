@@ -1,4 +1,5 @@
 from products import Product
+from typing import Union
 
 
 class Store:
@@ -38,11 +39,11 @@ class Store:
 
     def get_total_quantity(self) -> int:
         """
-        get total quantity of products in store
+        get total _quantity of products in store
         :return:
         :rtype:
         """
-        total = sum([product.quantity for product in self.products])
+        total = sum([product.product_quantity for product in self.products])
         return total
 
     def get_all_products(self) -> list[Product]:
@@ -60,32 +61,47 @@ class Store:
         :rtype:
         """
         shopping_list = []
-        print("Enter the product name and quantity to order")
+        print("Enter the product name and _quantity to order")
         while True:
-            self.get_all_products()
-            product_num = input("Enter the product number: ")
-            if product_num == "":
+            product_num = self._validate_prod_qty("product number")
+            if product_num is None:
                 break
-            try:
-                product_num = int(product_num)
-                if product_num < 1 or product_num > len(self.products):
-                    raise ValueError
-            except ValueError:
-                print("Invalid product number")
+
+            if product_num < 1 or product_num > len(self.products):
+                print("Invalid product number, please enter a valid number")
                 continue
             product = self.products[product_num - 1]
-            quantity = input("Enter the quantity: ")
-            try:
-                quantity = int(quantity)
-                if quantity < 1:
-                    raise ValueError
-            except ValueError:
-                print("Invalid quantity")
-                continue
+
+            quantity = self._validate_prod_qty("_quantity")
+            if quantity is None:
+                break
+
             print(f"Added {product.name} - {quantity} to the shopping list")
             shopping_list.append((product, quantity))
         self.order(shopping_list)
         return shopping_list
+
+    def _validate_prod_qty(self, message: str) -> Union[None, int]:
+        """
+        validate the order
+        :param pot_number:
+        :type pot_number:
+        :return:
+        :rtype:
+        """
+        while True:
+            user_number = input("Enter the {message}: ")
+            if user_number == "":
+                return None
+            try:
+                user_number = int(user_number)
+                if user_number < 1:
+                    print(f"Invalid {message}, please enter a valid number")
+                    continue
+                return user_number
+            except ValueError:
+                print(f"Invalid {message}, please enter a valid number")
+                continue
 
     def order(self, shopping_list: list[tuple[Product, int]]) -> float:
         """
@@ -108,16 +124,16 @@ class Store:
                     found_product = store_product
                     break
             if found_product:
-                if found_product.quantity >= basket_quantity:
+                if found_product.product_quantity >= basket_quantity:
                     total += found_product.price * basket_quantity
-                    found_product.quantity -= basket_quantity
+                    found_product.product_quantity -= basket_quantity
                     print(
                         f"{product.name} - {product.price} - {basket_quantity}"
                     )
                 else:
                     print(
                         f"Error: Unsufficient qty for {product.name}. "
-                        f"Available: {found_product.quantity}, Requested: {basket_quantity}"  # noqa E501
+                        f"Available: {found_product.product_quantity}, Requested: {basket_quantity}"  # noqa E501
                     )
 
         print("-" * 30)

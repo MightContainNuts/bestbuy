@@ -19,35 +19,45 @@ class Product:
 
         self.name = name
         self.price = round(float(price), 2)
-        self.quantity = quantity
-        self.active = active
+        self._quantity = quantity
+        self._active = active
 
-    def get_quantity(self) -> int:
+    @property
+    def product_quantity(self) -> int:
         """
-        get the quantity of the product
+        get the _quantity of the product
         :return:
         :rtype:
         """
-        return self.quantity
+        return self._quantity
 
-    def set_quantity(self, quantity: int) -> int:
+    @product_quantity.setter
+    def product_quantity(self, quantity: int) -> int:
         """
-        set the quantity of the product
+        set the _quantity of the product
         :param quantity:
         :type quantity:
         :return:
         :rtype:
         """
-        self.quantity = quantity
-        return self.quantity
+        if quantity < 0:
+            raise ValueError("Quantity should be a positive integer")
+        self._quantity = quantity
 
+    @property
     def is_active(self) -> bool:
         """
         check if the product is active
         :return:
         :rtype:
         """
-        return self.active
+        return self._active
+
+    @is_active.setter
+    def is_active(self, _active: bool) -> None:
+        if not isinstance(_active, bool):
+            raise ValueError("Active should be a boolean")
+        self._active = _active
 
     def activate(self) -> None:
         """
@@ -55,7 +65,7 @@ class Product:
         :return:
         :rtype:
         """
-        self.active = True
+        self.is_active = True
 
     def deactivate(self) -> None:
         """
@@ -63,7 +73,7 @@ class Product:
         :return:
         :rtype:
         """
-        self.active = False
+        self.is_active = False
 
     def show(self) -> str:
         """
@@ -71,20 +81,20 @@ class Product:
         :return:
         :rtype:
         """
-        return f"{self.name} - {str(self.price)} - {self.quantity}"
+        return f"{self.name} - {str(self.price)} - {self.product_quantity}"
 
     def buy(self, quantity_to_buy: int) -> float:
         """
         buy the product
-        :param quantity:
-        :type quantity:
+        :param _quantity:
+        :type _quantity:
         :return:
         :rtype:
         """
         self._validate_quantity(quantity_to_buy)
-        if self.quantity < quantity_to_buy:
-            raise ValueError("Not enough quantity")
-        self.quantity -= quantity_to_buy
+        if self.product_quantity < quantity_to_buy:
+            raise ValueError("Not enough _quantity")
+        self.product_quantity -= quantity_to_buy
         return round(self.price * quantity_to_buy, 2)
 
     @staticmethod
@@ -116,7 +126,7 @@ class Product:
     @staticmethod
     def _validate_quantity(quantity: int) -> bool:
         """
-        validate the quantity of the product
+        validate the _quantity of the product
         :param quantity:
         :type quantity:
         :return:

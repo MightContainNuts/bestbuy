@@ -44,7 +44,7 @@ def print_menu(menu: dict) -> None:
 
 def print_total_quantity(store: Store) -> None:
     """
-    print the total quantity
+    print the total _quantity
     :param total:
     :type total:
     :return:
@@ -53,7 +53,7 @@ def print_total_quantity(store: Store) -> None:
     total = store.get_total_quantity()
     print("\nQuantity of products in store:")
     print("-" * 30)
-    print(f"Total quantity: {total}")
+    print(f"Total _quantity: {total}")
     print("-" * 30 + "\n")
 
 
@@ -66,7 +66,7 @@ def print_all_products(store: Store) -> None:
     :rtype:
     """
     products = store.get_all_products()
-    print("\n All products in store:")
+    print("\nAll products in store:")
     print("-" * 30)
     for idx, product in enumerate(products):
         print(f"{idx + 1}:", product.show())
