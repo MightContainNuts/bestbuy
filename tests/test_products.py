@@ -122,15 +122,16 @@ def test_product_activate(test_product_instance):
     assert test_product_instance._active, "The product should be activated"
 
 
-def test_show(test_product_instance):
+def test_show_product(test_product_instance):
     assert (
-        test_product_instance.show() == "Product - 10.0 - 10"
-    ), "The product should be Product - 10.0 - 10 - True"
+        test_product_instance.show()
+        == "Product                        - 10.0   - 10    "
+    ), "The product should be Product - Product                        - 10.0   - 10    "  # noqa: E501
 
 
 def test_buy(test_product_instance):
-    test_buy = test_product_instance.buy(5)
-    assert test_buy == 50.0, "The total price should be 50.0"
+    test_shopping = test_product_instance.buy(5)
+    assert test_shopping == 50.0, "The total price should be 50.0"
     assert (
         test_product_instance.product_quantity == 5
     ), "The _quantity should be 5"

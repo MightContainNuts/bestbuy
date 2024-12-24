@@ -81,7 +81,7 @@ class Product:
         :return:
         :rtype:
         """
-        return f"{self.name} - {str(self.price)} - {self.product_quantity}"
+        return f"{self.name.ljust(30)} - {str(self.price).ljust(6)} - {str(self.product_quantity).ljust(6)}"  # noqa E501
 
     def buy(self, quantity_to_buy: int) -> float:
         """
@@ -135,3 +135,42 @@ class Product:
         if not isinstance(quantity, int) or quantity <= 0:
             raise ValueError("Quantity should be a positive integer")
         return True
+
+
+class NonStockedProducts(Product):
+
+    def __init__(self, name: str, price: float, active: bool = True) -> None:
+        super().__init__(name, price, active)
+        self._quantity = 0
+
+    def show(self) -> str:
+        """
+        show the product details
+        :return:
+        :rtype:
+        """
+        return (
+            f"{self.name.ljust(30)} - {str(self.price).ljust(6)} - On Demand"
+        )
+
+
+class LimitedProducts(Product):
+
+    def __init__(
+        self,
+        name: str,
+        price: float,
+        quantity: int,
+        active: bool = True,
+        maximum: int = 1,
+    ) -> None:
+        super().__init__(name, price, quantity, active)
+        self.maximum = maximum
+
+    def show(self) -> str:
+        """
+        show the product details
+        :return:
+        :rtype:
+        """
+        return f"{self.name.ljust(30)} - {str(self.price).ljust(6)} - {str(self.product_quantity).ljust(6)}(Max per order:{self.maximum})"  # noqa E501

@@ -1,4 +1,11 @@
-from products import Product
+from products import Product, NonStockedProducts, LimitedProducts
+from helpers import (
+    print_shopping_confirmation_start,
+    print_shopping_confirmation,
+    print_shopping_confirmation_end,
+    print_all_products,
+    print_total_quantity,
+)
 from typing import Union
 
 
@@ -23,7 +30,9 @@ class Store:
         :return:
         :rtype:
         """
-        if not isinstance(product, Product):
+        if not isinstance(
+            product, (Product, NonStockedProducts, LimitedProducts)
+        ):
             raise ValueError("Product should be an instance of Product")
         self.products.append(product)
 
@@ -44,6 +53,7 @@ class Store:
         :rtype:
         """
         total = sum([product.product_quantity for product in self.products])
+        print_total_quantity(total)
         return total
 
     def get_all_products(self) -> list[Product]:
@@ -52,6 +62,8 @@ class Store:
         :return:
         :rtype:
         """
+        products = self.products
+        print_all_products(products)
         return self.products
 
     def make_an_order(self) -> list[tuple[Product, int]]:
@@ -61,8 +73,9 @@ class Store:
         :rtype:
         """
         shopping_list = []
-        print("Enter the product name and _quantity to order")
+        print("Enter the product name and quantity to order")
         while True:
+            self.get_all_products()
             product_num = self._validate_prod_qty("product number")
             if product_num is None:
                 break
@@ -72,11 +85,11 @@ class Store:
                 continue
             product = self.products[product_num - 1]
 
-            quantity = self._validate_prod_qty("_quantity")
+            quantity = self._validate_prod_qty("quantity")
             if quantity is None:
                 break
-
-            print(f"Added {product.name} - {quantity} to the shopping list")
+            print_shopping_confirmation(product, quantity)
+            print("Added to the shopping list")
             shopping_list.append((product, quantity))
         self.order(shopping_list)
         return shopping_list
@@ -90,7 +103,7 @@ class Store:
         :rtype:
         """
         while True:
-            user_number = input("Enter the {message}: ")
+            user_number = input(f"Enter the {message}: ")
             if user_number == "":
                 return None
             try:
@@ -112,7 +125,8 @@ class Store:
         :rtype:
         """
         print("\nOrder summary:")
-        print("-" * 30)
+        print("-" * 70)
+        print_shopping_confirmation_start()
 
         total = 0
 
@@ -124,18 +138,37 @@ class Store:
                     found_product = store_product
                     break
             if found_product:
-                if found_product.product_quantity >= basket_quantity:
+                if isinstance(found_product, NonStockedProducts):
+                    total += found_product.price * basket_quantity
+                    print_shopping_confirmation(found_product, basket_quantity)
+
+                elif (
+                    isinstance(found_product, LimitedProducts)
+                    and found_product.product_quantity >= 1
+                ):
+                    MAX = 1
+                    if basket_quantity > 1:
+                        print(
+                            f"*{found_product.name} can only be applied {MAX} time(s) per order (ordered {basket_quantity} time(s))"  # noqa E501
+                        )  # noqa E501
+                        basket_quantity = MAX
+
+                    total += found_product.price * basket_quantity
+                    found_product.product_quantity -= 1
+                    print_shopping_confirmation(found_product, basket_quantity)
+                elif (
+                    isinstance(found_product, Product)
+                    and found_product.product_quantity >= basket_quantity
+                ):
                     total += found_product.price * basket_quantity
                     found_product.product_quantity -= basket_quantity
-                    print(
-                        f"{product.name} - {product.price} - {basket_quantity}"
-                    )
+                    print_shopping_confirmation(found_product, basket_quantity)
                 else:
                     print(
                         f"Error: Unsufficient qty for {product.name}. "
                         f"Available: {found_product.product_quantity}, Requested: {basket_quantity}"  # noqa E501
                     )
 
-        print("-" * 30)
+        print_shopping_confirmation_end()
         print(f"Total: {total} \n")
         return total

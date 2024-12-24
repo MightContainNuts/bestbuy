@@ -1,4 +1,5 @@
-from main import print_menu, print_total_quantity, print_all_products, start
+from helpers import print_menu, print_total_quantity, print_all_products
+from main import start
 from store import Store
 from products import Product
 
@@ -39,9 +40,10 @@ def test_print_total_quantity(
     capsys, test_store, test_product_1, test_product_2
 ):
     test_store.products = [test_product_1, test_product_2]
-    print_total_quantity(test_store)
+    total = test_store.get_total_quantity()
+    assert total == 600
     captured = capsys.readouterr()
     assert (
         captured.out
-        == "\nQuantity of products in store:\n------------------------------\nTotal _quantity: 600\n------------------------------\n\n"  # noqa E501
+        == "\nQuantity of products in store:\n------------------------------\nTotal quantity: 600\n------------------------------\n\n"  # noqa E501
     )
