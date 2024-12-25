@@ -1,7 +1,7 @@
 from store import Store
-from products import Product
+from products import Product, NonStockedProducts, LimitedProducts
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 
 @pytest.fixture
@@ -17,6 +17,16 @@ def test_product_1():
 @pytest.fixture
 def test_product_2():
     return Product("Bose QuietComfort Earbuds", price=250, quantity=500)
+
+
+@pytest.fixture
+def test_non_stock_product():
+    return NonStockedProducts(name="NonStockProduct", price=10.0)
+
+
+@pytest.fixture
+def test_limited_stock_product():
+    return LimitedProducts(name="LimitedProduct", price=10.0, quantity=10)
 
 
 def test_store_instance(test_store):
@@ -110,3 +120,41 @@ def test_make_an_order_not_in_store(
             "Invalid product number, please enter a valid number"
             in captured.out
         )
+
+
+def test_valaidate_prod_quantity_raise(test_store, capsys):
+    with patch("builtins.input", side_effect=["abc", "1"]):
+        test_store._validate_prod_qty("quantity")
+        captured = capsys.readouterr()
+        assert "Invalid quantity, please enter a valid number" in captured.out
+
+
+def test_order_non_stocked_product(test_store, test_non_stock_product, capfd):
+    test_store.products = [test_non_stock_product]
+    assert test_store.order([(test_non_stock_product, 10)]) == 100
+
+
+def test_order_limited_stock_product(
+    test_store, test_limited_stock_product, capfd
+):
+    test_store.products = [test_limited_stock_product]
+    assert test_store.order([(test_limited_stock_product, 10)]) == 10
+
+
+def test_make_an_order_breaks_on_none_input():
+    # Mock the products list
+    mock_product = MagicMock(spec=Product)
+    mock_product.name = "Test Product"
+    mock_product.price = 10.0
+
+    # Assuming there is only one product in the list for simplicity
+    store = Store()
+    store.products = [mock_product]
+
+    # Patch the input function to simulate user input
+    with patch("builtins.input", side_effect=["1", ""]):
+        # Call the make_an_order method
+        order = store.make_an_order()
+
+    # Check that the loop breaks after the second input (None)
+    assert len(order) == 0

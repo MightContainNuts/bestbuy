@@ -1,11 +1,5 @@
 from products import Product, NonStockedProducts, LimitedProducts
-from helpers import (
-    print_shopping_confirmation_start,
-    print_shopping_confirmation,
-    print_shopping_confirmation_end,
-    print_all_products,
-    print_total_quantity,
-)
+from ui_helpers import UIHelpers
 from typing import Union
 
 
@@ -53,7 +47,7 @@ class Store:
         :rtype:
         """
         total = sum([product.product_quantity for product in self.products])
-        print_total_quantity(total)
+        UIHelpers.print_total_quantity(total)
         return total
 
     def get_all_products(self) -> list[Product]:
@@ -63,7 +57,7 @@ class Store:
         :rtype:
         """
         products = self.products
-        print_all_products(products)
+        UIHelpers.print_all_products(products)
         return self.products
 
     def make_an_order(self) -> list[tuple[Product, int]]:
@@ -88,7 +82,7 @@ class Store:
             quantity = self._validate_prod_qty("quantity")
             if quantity is None:
                 break
-            print_shopping_confirmation(product, quantity)
+            UIHelpers.print_shopping_confirmation(product, quantity)
             print("Added to the shopping list")
             shopping_list.append((product, quantity))
         self.order(shopping_list)
@@ -126,7 +120,7 @@ class Store:
         """
         print("\nOrder summary:")
         print("-" * 70)
-        print_shopping_confirmation_start()
+        UIHelpers.print_shopping_confirmation_start()
 
         total = 0
 
@@ -140,7 +134,9 @@ class Store:
             if found_product:
                 if isinstance(found_product, NonStockedProducts):
                     total += found_product.price * basket_quantity
-                    print_shopping_confirmation(found_product, basket_quantity)
+                    UIHelpers.print_shopping_confirmation(
+                        found_product, basket_quantity
+                    )
 
                 elif (
                     isinstance(found_product, LimitedProducts)
@@ -155,20 +151,24 @@ class Store:
 
                     total += found_product.price * basket_quantity
                     found_product.product_quantity -= 1
-                    print_shopping_confirmation(found_product, basket_quantity)
+                    UIHelpers.print_shopping_confirmation(
+                        found_product, basket_quantity
+                    )
                 elif (
                     isinstance(found_product, Product)
                     and found_product.product_quantity >= basket_quantity
                 ):
                     total += found_product.price * basket_quantity
                     found_product.product_quantity -= basket_quantity
-                    print_shopping_confirmation(found_product, basket_quantity)
+                    UIHelpers.print_shopping_confirmation(
+                        found_product, basket_quantity
+                    )
                 else:
                     print(
                         f"Error: Unsufficient qty for {product.name}. "
                         f"Available: {found_product.product_quantity}, Requested: {basket_quantity}"  # noqa E501
                     )
 
-        print_shopping_confirmation_end()
+        UIHelpers.print_shopping_confirmation_end()
         print(f"Total: {total} \n")
         return total

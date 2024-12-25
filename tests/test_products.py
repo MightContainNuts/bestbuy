@@ -1,10 +1,20 @@
 import pytest
-from products import Product
+from products import Product, NonStockedProducts, LimitedProducts
 
 
 @pytest.fixture
 def test_product_instance():
     return Product(name="Product", price=10.0, quantity=10)
+
+
+@pytest.fixture
+def test_non_stock_product_instance():
+    return NonStockedProducts(name="NonStockProduct", price=10.0)
+
+
+@pytest.fixture
+def test_limited_stock_instance():
+    return LimitedProducts(name="LimitedProduct", price=10.0, quantity=10)
 
 
 def test_validate_name_is_string():
@@ -143,3 +153,35 @@ def test_buy_with_invalid_quantity(test_product_instance):
     assert (
         test_product_instance.product_quantity == 10
     ), "The _quantity should be 10"
+
+
+def test_show_with_non_stocked_product(
+    test_non_stock_product_instance: NonStockedProducts,
+):
+    expected = "NonStockProduct                - 10.0   - On Demand"
+    assert (
+        test_non_stock_product_instance.show() == expected
+    ), "show message is incorrect"  # noqa: E501
+
+
+def test_show_with_limited_product_instance(
+    test_limited_stock_instance: LimitedProducts,
+):
+    expected = (
+        "LimitedProduct                 - 10.0   - 10    (Max per order:1)"
+    )
+    assert (
+        test_limited_stock_instance.show() == expected
+    ), "show message is incorrect"  # noqa: E501
+
+
+def test_is_active_setter_bool(test_product_instance):
+    with pytest.raises(ValueError, match="Active should be a boolean"):
+        test_product_instance.is_active = 123
+
+
+def test_product_quantity_negative_int(test_product_instance):
+    with pytest.raises(
+        ValueError, match="Quantity should be a positive integer"
+    ):
+        test_product_instance.product_quantity = -1

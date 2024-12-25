@@ -1,9 +1,11 @@
 from products import Product, NonStockedProducts, LimitedProducts
 from store import Store
-from helpers import print_menu
+from ui_helpers import UIHelpers
 
 
-def start(store: Store) -> None:
+def start(
+    store: Store, test_mode: bool = False, test_iterations: int = 5
+) -> None:
     """
     menu for the store
     :param store:
@@ -17,8 +19,9 @@ def start(store: Store) -> None:
         3: ("Make an order ", store.make_an_order),
         4: ("Quit", exit),
     }
+    iterations = 0
     while True:
-        print_menu(menu)
+        UIHelpers.print_menu(menu)
         choice = input("Enter your choice: ")
         try:
             choice = int(choice)
@@ -28,6 +31,20 @@ def start(store: Store) -> None:
         if choice in menu:
             func = menu[choice][1]
             func()
+        if test_mode:
+            iterations += 1
+            if iterations >= test_iterations:
+                break
+
+
+def exit():
+    """
+    exit the program
+    :return:
+    :rtype:
+    """
+    print("Exiting program")
+    raise SystemExit
 
 
 if __name__ == "__main__":
