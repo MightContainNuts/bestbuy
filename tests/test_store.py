@@ -1,6 +1,7 @@
 from store import Store
 from products import Product, NonStockedProducts, LimitedProducts
 import pytest
+import re
 from unittest.mock import patch, MagicMock
 
 
@@ -134,11 +135,16 @@ def test_order_non_stocked_product(test_store, test_non_stock_product, capfd):
     assert test_store.order([(test_non_stock_product, 10)]) == 100
 
 
-def test_order_limited_stock_product(
-    test_store, test_limited_stock_product, capfd
-):
+def test_order_limited_stock_product(test_store, test_limited_stock_product):
     test_store.products = [test_limited_stock_product]
-    assert test_store.order([(test_limited_stock_product, 10)]) == 10
+
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "LimitedProduct can only be applied 1 time(s) per order (ordered 10 time(s))"  # noqa: E501
+        ),
+    ):
+        test_store.order([(test_limited_stock_product, 10)])
 
 
 def test_make_an_order_breaks_on_none_input():
@@ -146,15 +152,8 @@ def test_make_an_order_breaks_on_none_input():
     mock_product = MagicMock(spec=Product)
     mock_product.name = "Test Product"
     mock_product.price = 10.0
-
-    # Assuming there is only one product in the list for simplicity
     store = Store()
     store.products = [mock_product]
-
-    # Patch the input function to simulate user input
     with patch("builtins.input", side_effect=["1", ""]):
-        # Call the make_an_order method
         order = store.make_an_order()
-
-    # Check that the loop breaks after the second input (None)
     assert len(order) == 0

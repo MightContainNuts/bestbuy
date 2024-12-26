@@ -144,10 +144,9 @@ class Store:
                 ):
                     MAX = 1
                     if basket_quantity > 1:
-                        print(
-                            f"*{found_product.name} can only be applied {MAX} time(s) per order (ordered {basket_quantity} time(s))"  # noqa E501
-                        )  # noqa E501
-                        basket_quantity = MAX
+                        raise ValueError(
+                            f"{found_product.name} can only be applied {MAX} time(s) per order (ordered {basket_quantity} time(s))"  # noqa E501
+                        )
 
                     total += found_product.price * basket_quantity
                     found_product.product_quantity -= 1
