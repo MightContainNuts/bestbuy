@@ -1,6 +1,22 @@
+"""
+promotions.py contains all methods and classes for the products
+Product class is for the main products
+Limited are those that have restrictions on amount per order
+Non Stocked contain items that have no physical presence in the store
+"""
+
+# imports
+from promotions import Promotions
+
+
 class Product:
     def __init__(
-        self, name: str, price: float, quantity: int, active: bool = True
+        self,
+        name: str,
+        price: float,
+        quantity: int,
+        active: bool = True,
+        promotions: Promotions = None,
     ) -> None:
         """
         initialize a product
@@ -21,6 +37,7 @@ class Product:
         self.price = round(float(price), 2)
         self._quantity = quantity
         self._active = active
+        self._promotions = promotions if promotions is not None else []
 
     @property
     def product_quantity(self) -> int:
@@ -59,6 +76,64 @@ class Product:
             raise ValueError("Active should be a boolean")
         self._active = _active
 
+    @property
+    def promotions(self) -> list[Promotions]:
+        """
+        get the promotions of the product
+        :return:
+        :rtype:
+        """
+        return self._promotions
+
+    @promotions.setter
+    def promotions(self, promotions: list) -> None:
+        """
+        set the promotions of the product
+        :param promotions:
+        :type promotions:
+        :return:
+        :rtype:
+        """
+        if not isinstance(promotions, list):
+            raise ValueError("Promotions should be a list")
+        self._promotions = promotions
+
+    def create_promotion_text(self) -> str:
+        """create promotion text"""
+        return " - ".join(str(promotion) for promotion in self.promotions)
+
+    # public methods
+    def add_promotion(self, promotion: Promotions) -> None:
+        """
+        add a new product promotion to a list
+        :param promotion:
+        :type promotion:
+        :return:
+        :rtype:
+        """
+        if not isinstance(promotion, Promotions):
+            raise ValueError("Promotion must be a valid promotion object")
+        if promotion not in self.promotions:
+            self.promotions.append(promotion)
+            self.promotions.sort(key=lambda promo: str(promo))
+        else:
+            print(f"Promotion already applied to {self.name}")
+
+    def remove_promotion(self, promotion: Promotions) -> None:
+        """
+        remove an existing promotion for a product
+        :param promotion:
+        :type promotion:
+        :return:
+        :rtype:
+        """
+        if not isinstance(promotion, Promotions):
+            raise ValueError("Promotion must be a valid promotion object")
+        if promotion in self.promotions:
+            self.promotions.remove(promotion)
+        else:
+            print(f"Promotion was not applied to {self.name}")
+
     def activate(self) -> None:
         """
         activate the product
@@ -81,7 +156,11 @@ class Product:
         :return:
         :rtype:
         """
-        return f"{self.name.ljust(30)} - {str(self.price).ljust(6)} - {str(self.product_quantity).ljust(6)}"  # noqa E501
+        promotion_text = self.create_promotion_text()
+        return (
+            f"{self.name.ljust(30)} - {str(self.price).ljust(6)} - {str(self.product_quantity).ljust(6)}\n"  # noqa E501
+            + promotion_text  # noqa E501
+        )
 
     def buy(self, quantity_to_buy: int) -> float:
         """
@@ -97,6 +176,7 @@ class Product:
         self.product_quantity -= quantity_to_buy
         return round(self.price * quantity_to_buy, 2)
 
+    # private methods
     @staticmethod
     def _validate_name(name: str) -> bool:
         """
@@ -149,9 +229,11 @@ class NonStockedProducts(Product):
         :return:
         :rtype:
         """
+        promotion_text = self.create_promotion_text()
         return (
-            f"{self.name.ljust(30)} - {str(self.price).ljust(6)} - On Demand"
-        )
+            f"{self.name.ljust(30)} - {str(self.price).ljust(6)} - On Demand\n"
+            + promotion_text
+        )  # noqa E501
 
 
 class LimitedProducts(Product):
@@ -173,4 +255,8 @@ class LimitedProducts(Product):
         :return:
         :rtype:
         """
-        return f"{self.name.ljust(30)} - {str(self.price).ljust(6)} - {str(self.product_quantity).ljust(6)}(Max per order:{self.maximum})"  # noqa E501
+        promotion_text = self.create_promotion_text()
+        return (
+            f"{self.name.ljust(30)} - {str(self.price).ljust(6)} - {str(self.product_quantity).ljust(6)}(Max per order:{self.maximum})\n"  # noqa E501
+            + promotion_text  # noqa E501
+        )

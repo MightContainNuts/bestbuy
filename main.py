@@ -1,9 +1,18 @@
+"""
+main.py
+contains the start menu and executables
+"""
+
+# imports
 from products import Product, NonStockedProducts, LimitedProducts
+from promotions import PercentDiscount, SecondHalfPrice, ThirdOneFree
 from store import Store
-from helpers import print_menu
+from ui_helpers import UIHelpers
 
 
-def start(store: Store) -> None:
+def start(
+    store: Store, test_mode: bool = False, test_iterations: int = 5
+) -> None:
     """
     menu for the store
     :param store:
@@ -13,12 +22,13 @@ def start(store: Store) -> None:
     """
     menu = {
         1: ("List all products in store", store.get_all_products),
-        2: ("Show total amount in store", store.get_total_quantity),
+        2: ("Show quantity amount in store", store.get_total_quantity),
         3: ("Make an order ", store.make_an_order),
         4: ("Quit", exit),
     }
+    iterations = 0
     while True:
-        print_menu(menu)
+        UIHelpers.print_menu(menu)
         choice = input("Enter your choice: ")
         try:
             choice = int(choice)
@@ -28,6 +38,20 @@ def start(store: Store) -> None:
         if choice in menu:
             func = menu[choice][1]
             func()
+        if test_mode:
+            iterations += 1
+            if iterations >= test_iterations:
+                break
+
+
+def exit():
+    """
+    exit the program
+    :return:
+    :rtype:
+    """
+    print("Exiting program")
+    raise SystemExit
 
 
 if __name__ == "__main__":
@@ -39,5 +63,14 @@ if __name__ == "__main__":
         NonStockedProducts("Windows License", price=125),
         LimitedProducts("Shipping", price=10, quantity=250, maximum=1),
     ]
-    best_buy = Store(product_list)
-    start(best_buy)
+    second_half_price = SecondHalfPrice("Second Half price!")
+    third_one_free = ThirdOneFree("Third One Free!")
+    thirty_percent = PercentDiscount("30% off!", percent=30)
+
+    product_list[0].add_promotion(second_half_price)
+    product_list[1].add_promotion(third_one_free)
+    product_list[3].add_promotion(thirty_percent)
+    product_list[3].add_promotion(third_one_free)
+
+    for product in product_list:
+        print(product.show())
