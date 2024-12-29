@@ -41,7 +41,7 @@ def test_print_shopping_start(capsys):
         + "Product".ljust(30)
         + "Price".center(15)
         + "Qty".center(6)
-        + "Sub-total".center(10)
+        + "Sub-quantity".center(10)
         + "\n"
         + "-" * 80
         + "\n"

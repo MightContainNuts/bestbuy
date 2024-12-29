@@ -1,8 +1,8 @@
-from store import Store
-from products import Product, NonStockedProducts, LimitedProducts
 import pytest
-import re
-from unittest.mock import patch, MagicMock
+
+from products import Product, NonStockedProducts, LimitedProducts
+from promotions import SecondHalfPrice, ThirdOneFree, PercentDiscount
+from store import Store
 
 
 @pytest.fixture
@@ -30,14 +30,33 @@ def test_limited_stock_product():
     return LimitedProducts(name="LimitedProduct", price=10.0, quantity=10)
 
 
+@pytest.fixture
+def test_promotion_shp(test_product_1):
+    return SecondHalfPrice("Second Half Price!")
+
+
+@pytest.fixture
+def test_promotion_tif(test_product_1):
+    return ThirdOneFree("Third One Free!")
+
+
+@pytest.fixture
+def test_promotion_pd(test_product_1):
+    discount = 30
+    return PercentDiscount("30% off!", discount)
+
+
 def test_store_instance(test_store):
     assert isinstance(test_store, Store)
 
 
+# test for instance
 def test_store_products(test_store):
     assert test_store.products == []
 
 
+# tests for add_product, remove product.
+# TODO might need updating if the methods change to getter, setter
 def test_add_product(test_store, test_product_1):
     assert test_store.products == []
     test_store.add_product(test_product_1)
@@ -57,11 +76,13 @@ def test_remove_product(test_store, test_product_1):
     assert test_store.products == []
 
 
+# tests for quantity getter, setter
 def test_total_quantity(test_store, test_product_1, test_product_2):
     test_store.products = [test_product_1, test_product_2]
     assert test_store.get_total_quantity() == 600
 
 
+# tests for get all products
 def test_get_all_products(test_store, test_product_1, test_product_2):
     test_store.products = [test_product_1, test_product_2]
     assert test_store.get_all_products() == [test_product_1, test_product_2]
@@ -71,89 +92,126 @@ def test_get_all_products_empty(test_store):
     assert test_store.get_all_products() == []
 
 
+# tests for order process
 def test_order_empty(test_store):
-    assert test_store.order([]) == 0
+    assert test_store._order([]) == 0
 
 
-def test_order(test_store, test_product_1, test_product_2):
-    test_store.products = [test_product_1, test_product_2]
-    assert test_store.order([(test_product_1, 1), (test_product_2, 2)]) == 1950
+def test__find_product_return_none(test_store, test_product_1, test_product_2):
+    test_store.add_product(test_product_1)
+    assert not test_store._find_product(test_product_2)
 
 
-def test_order_not_enough_stock(
-    test_store, test_product_1, test_product_2, capfd
+# tests for applying promotions to shoppping basket
+def test_calc_subtotal_stocked_product(test_store, test_product_1):
+    basket_quantity = 1
+    subtotal = test_store._calc_subtotal_stocked_product(
+        test_product_1, basket_quantity
+    )
+    assert subtotal == 1450
+
+
+def test_calc_subtotal_with_stocked_product_not_enough_stock(
+    test_store, test_product_1, capfd
 ):
-    test_store.products = [test_product_1, test_product_2]
-    shopping_list = [(test_product_1, 10), (test_product_2, 600)]
-    test_store.order(shopping_list)
+    basket_quantity = 101
+    test_store._calc_subtotal_stocked_product(test_product_1, basket_quantity)
     captured = capfd.readouterr()
-    assert "Error: Unsufficient qty for" in captured.out
-    assert "Available: 500, Requested: 600" in captured.out
-    assert "Total: 14500" in captured.out
+    expected = "Error: Unsufficient qty for MacBook Air M2. Available: 100, Requested: 101\n"  # noqa E501
+    assert captured.out == expected
 
 
-def test_make_an_order(test_store, test_product_1, test_product_2):
-    test_store.products = [test_product_1, test_product_2]
-    # shopping_list = [(test_product_1, 1), (test_product_2, 2)]
-    with patch("builtins.input", side_effect=["1", "1", "2", "2", ""]):
-        shopping_list = test_store.make_an_order()
-    assert shopping_list == [(test_product_1, 1), (test_product_2, 2)]
+def test_calc_subtotal_limited_stock(test_store, test_limited_stock_product):
+    basket_quantity = 1
+    expected_subtotal = basket_quantity * test_limited_stock_product.price
+    subtotal = test_store._calc_subtotal_limited_product(
+        test_limited_stock_product, basket_quantity
+    )
+    assert subtotal == expected_subtotal
 
 
-def test_make_an_order_invalid_quantity(
-    test_store, test_product_1, test_product_2, capfd
+def test_calc_subtotal_limited_stock_invalid(
+    test_store, test_limited_stock_product
 ):
-    test_store.products = [test_product_1, test_product_2]
-    with patch("builtins.input", side_effect=["0", "1"]):
-        test_store._validate_prod_qty("message")
-        captured = capfd.readouterr()
-        assert "Invalid message, please enter a valid number" in captured.out
-
-
-def test_make_an_order_not_in_store(
-    test_store, test_product_1, test_product_2, capfd
-):
-    test_store.products = [test_product_1, test_product_2]
-    with patch("builtins.input", side_effect=["3", "1", "2", ""]):
-        test_store.make_an_order()
-        captured = capfd.readouterr()
-        assert (
-            "Invalid product number, please enter a valid number"
-            in captured.out
+    basket_quantity = 2
+    with pytest.raises(ValueError):
+        test_store._calc_subtotal_limited_product(
+            test_limited_stock_product, basket_quantity
         )
 
 
-def test_valaidate_prod_quantity_raise(test_store, capsys):
-    with patch("builtins.input", side_effect=["abc", "1"]):
-        test_store._validate_prod_qty("quantity")
-        captured = capsys.readouterr()
-        assert "Invalid quantity, please enter a valid number" in captured.out
+def test_calc_non_stocked_product(test_store, test_non_stock_product):
+    basket_quantity = 2
+    expected_subtotal = basket_quantity * test_non_stock_product.price
+    subtotal = test_store._calc_subtotal_non_stocked_product(
+        test_non_stock_product, basket_quantity
+    )
+    assert subtotal == expected_subtotal
 
 
-def test_order_non_stocked_product(test_store, test_non_stock_product, capfd):
-    test_store.products = [test_non_stock_product]
-    assert test_store.order([(test_non_stock_product, 10)]) == 100
+def test__calc_any_promotions_shp(
+    test_promotion_shp, test_store, test_product_1
+):
+    test_store.add_product(test_product_1)
+    test_product_1.add_promotion(test_promotion_shp)
+    basket_quantity = 10
+    current_subtotal = basket_quantity * test_product_1.price
+
+    result = test_store._calc_any_promotions(
+        test_product_1,
+        current_subtotal=current_subtotal,
+        basket_quantity=basket_quantity,
+    )
+    assert result == round(
+        test_product_1.price * 5 + test_product_1.price / 2 * 5, 2
+    )
 
 
-def test_order_limited_stock_product(test_store, test_limited_stock_product):
-    test_store.products = [test_limited_stock_product]
+def test__calc_any_promotions_multiple(
+    test_promotion_shp,
+    test_promotion_pd,
+    test_promotion_tif,
+    test_product_1,
+    test_store,
+):
+    test_store.add_product(test_product_1)
+    test_product_1.add_promotion(test_promotion_tif)
+    test_product_1.add_promotion(test_promotion_shp)
+    test_product_1.add_promotion(test_promotion_pd)
 
-    with pytest.raises(
-        ValueError,
-        match=re.escape(
-            "LimitedProduct can only be applied 1 time(s) per order (ordered 10 time(s))"  # noqa: E501
-        ),
-    ):
-        test_store.order([(test_limited_stock_product, 10)])
+    assert test_product_1.promotions == [
+        test_promotion_tif,
+        test_promotion_shp,
+        test_promotion_pd,
+    ]
+    basket_quantity = 10
+    current_subtotal = basket_quantity * test_product_1.price
 
-
-def test_make_an_order_breaks_on_none_input():
-    # Mock the products list
-    mock_product = MagicMock(spec=Product)
-    mock_product.name = "Test Product"
-    mock_product.price = 10.0
-    store = Store()
-    store.products = [mock_product]
-    with patch("builtins.input", side_effect=["1", ""]):
-        order = store.make_an_order()
-    assert len(order) == 0
+    result = test_store._calc_any_promotions(
+        test_product_1,
+        current_subtotal=current_subtotal,
+        basket_quantity=basket_quantity,
+    )
+    print(result)
+    # math for calculating tif
+    print(f"Current subtotal: {current_subtotal}")
+    free_items = basket_quantity // 3
+    full_price_items = basket_quantity - free_items
+    res_tif = round(current_subtotal * full_price_items / basket_quantity, 2)
+    print(f"result tif: {res_tif}")  # 10150
+    # math for shp
+    price_per_item = res_tif / basket_quantity
+    discounted_items = basket_quantity // 2
+    full_price_items = basket_quantity - discounted_items
+    full_price_total = full_price_items * price_per_item
+    discounted_total = discounted_items * price_per_item / 2
+    res_shp = round(
+        full_price_total + discounted_total,
+        2,
+    )
+    # math for 30%
+    res_30 = res_shp * (1 - 0.3)
+    print(
+        f"Subtotal: {current_subtotal}, after tif: {res_tif} after shp {res_shp} after 30%: {res_30}"  # noqa E501
+    )  # 5328.75
+    assert result == 5328.75

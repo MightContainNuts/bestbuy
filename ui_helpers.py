@@ -1,3 +1,10 @@
+"""
+ui)helpers.py
+contains all the ui print methods fr displaying to the screen
+no inheritance or class related objects. Just in a lass to keep them organised
+"""
+
+
 class UIHelpers:
 
     @staticmethod
@@ -8,7 +15,7 @@ class UIHelpers:
         :rtype:
         """
         print("-" * 80)
-        print(f"{'Product':<30}{'Price':^15}{'Qty':^6}{'Sub-total':^10}")
+        print(f"{'Product':<30}{'Price':^15}{'Qty':^6}{'Sub-quantity':^10}")
         print("-" * 80)
 
     @staticmethod
@@ -53,7 +60,7 @@ class UIHelpers:
     @staticmethod
     def print_total_quantity(total: int) -> None:
         """
-        print the total _quantity
+        print the quantity _quantity
         :param total:
         :type total:
         :return:

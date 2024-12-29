@@ -24,7 +24,7 @@ def test_product_2():
 
 def test_print_menu(capsys):
     menu = {
-        1: ("Print total _quantity", UIHelpers.print_total_quantity),
+        1: ("Print quantity _quantity", UIHelpers.print_total_quantity),
         2: ("Print all products", UIHelpers.print_all_products),
         3: ("Start", start),
         4: ("Quit", exit),
@@ -33,7 +33,7 @@ def test_print_menu(capsys):
     captured = capsys.readouterr()
     assert (
         captured.out
-        == "Menu:\n1: Print total _quantity\n2: Print all products\n3: Start\n4: Quit\n"  # noqa E501
+        == "Menu:\n1: Print quantity _quantity\n2: Print all products\n3: Start\n4: Quit\n"  # noqa E501
     )
 
 
