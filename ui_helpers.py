@@ -54,7 +54,7 @@ class UIHelpers:
         print("\nAll products in store:")
         UIHelpers.print_shopping_confirmation_start()
         for idx, product in enumerate(products):
-            print(f"{idx + 1}:", product.show())
+            print(f"{idx + 1}:", str(product))
         UIHelpers.print_shopping_confirmation_end()
 
     @staticmethod

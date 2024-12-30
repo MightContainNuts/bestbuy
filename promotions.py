@@ -82,7 +82,7 @@ class SecondHalfPrice(Promotions):
         :return:
         :rtype:
         """
-        return "Promotion: 02 Sort Second"
+        return f"Promotion: 02 {self.description}"
 
     def apply_promotion(
         self, current_total: float, basket_quantity: int
@@ -121,7 +121,7 @@ class ThirdOneFree(Promotions):
         self.EVERY_N_FREE = 3
 
     def __str__(self):
-        return "Promotion: 02 Sort First"
+        return f"Promotion: 01 {self.description}"
 
     def apply_promotion(self, current_total, basket_quantity):
         """
@@ -150,7 +150,7 @@ class PercentDiscount(Promotions):
         self.discount = percent / 100
 
     def __str__(self):
-        return "Promotion: 03 Sort Third"
+        return f"Promotion: 03 {self.description}"
 
     def apply_promotion(self, current_total, basket_quantity):
         """

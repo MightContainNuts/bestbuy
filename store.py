@@ -23,6 +23,36 @@ class Store:
         :type products:
         """
         self.products = products if products else []
+        self.stores = {}
+
+    def __contains__(self, product):
+        """
+        implements product in products
+                :param item:
+                :type item:
+                :return:
+                :rtype:
+        """
+        return product in self.products
+
+    def __add__(self, other):
+        """
+        Combine two _stores using the + operator.
+        :param other: Another store instance
+        :type other: Store
+        :return: A new store with combined products
+        :rtype: Store
+        """
+        if not isinstance(other, Store):
+            raise ValueError("Can only combine with another Store instance.")
+
+        # Create a new store
+        combined_store = Store()
+
+        # Add products from both _stores
+        combined_store.products = self.products + other.products
+
+        return combined_store
 
     def add_product(self, product: Product) -> None:
         """
@@ -261,3 +291,100 @@ class Store:
                 current_subtotal = subtotal_after_promotion
 
         return current_subtotal
+
+
+class StoreManager:
+    def __init__(self):
+        self._stores = {}  # Dictionary to store {store_name: Store instance}
+
+    @property
+    def stores(self):
+        return self._stores
+
+    @stores.setter
+    def stores(self, store_dict):
+        # setter for stores
+        if not isinstance(store_dict, dict):
+            raise ValueError("Stores must be a dictionary")
+        self._stores = store_dict
+
+    def add_two_stores(self):
+        """
+        Combine two stores into a new store.
+        :return: The combined store name
+        :rtype: str
+        """
+        print("Adding two stores to make a combination")
+
+        # Validate and retrieve the first store
+        store_1 = None
+        while not store_1:
+            store_name_1 = input("Enter name for store 1: ").strip()
+            store_1 = self.stores.get(store_name_1)
+            if not store_1:
+                print(f"{store_name_1}' doesn't exist. Creating a new store.")
+                store_1 = Store()
+                self._add_store(store_name_1, store_1)
+
+        # Validate and retrieve the second store
+        store_2 = None
+        while not store_2:
+            store_name_2 = input("Enter name for store 2: ").strip()
+            store_2 = self.stores.get(store_name_2)
+            if not store_2:
+                print(f"{store_name_2} doesn't exist. Creating new store.")
+                store_2 = Store()
+                self._add_store(store_name_2, store_2)
+
+        # Combine the stores
+        combined_store = store_1 + store_2
+        combined_store_name = f"{store_name_1}_{store_name_2}_combined"
+        print(f"Creating combined store: {combined_store_name}")
+
+        # Add the combined store to the manager
+        self._add_store(combined_store_name, combined_store)
+        print(
+            f"Stores combined successfully! {combined_store_name} added to Store Manager"  # noqa E501
+        )
+
+        return combined_store_name
+
+    def _add_store(self, store_name: str, new_store_instance: Store) -> None:
+        if store_name in self.stores:
+            print("Store name already exists!")
+        else:
+            self.stores[store_name] = new_store_instance
+            print(f"{store_name} created and added to Store Manager:")
+
+    def _is_store_name(self, store_name) -> bool:
+        """
+        Check if store name exists.
+        :param store_name: Name of the store
+        :type store_name: str
+        :return: True if the store exists, False otherwise
+        :rtype: bool
+        """
+        return store_name in self._stores
+
+    def _validate_store_name(self, store_name_number):
+        """
+        Validate or create a store based on the name.
+        :param store_name_number: Number indicating which store (1 or 2)
+        :type store_name_number: int
+        :return: The store instance
+        :rtype: Store
+        """
+        while True:
+            store_name = input(
+                f"Enter name for store {store_name_number}: "
+            ).strip()
+            if not store_name:
+                print("Store name cannot be empty. Please try again.")
+                continue
+
+            if self._is_store_name(store_name):
+                print(f"Store found: {store_name}")
+                return self._stores[store_name]
+            else:
+                print(f"Store {store_name} does not exist.")
+                return None  # Return None if the store doesn't exist

@@ -1,8 +1,10 @@
+from unittest.mock import patch
+
 import pytest
 
 from products import Product, NonStockedProducts, LimitedProducts
 from promotions import SecondHalfPrice, ThirdOneFree, PercentDiscount
-from store import Store
+from store import Store, StoreManager
 
 
 @pytest.fixture
@@ -215,3 +217,36 @@ def test__calc_any_promotions_multiple(
         f"Subtotal: {current_subtotal}, after tif: {res_tif} after shp {res_shp} after 30%: {res_30}"  # noqa E501
     )  # 5328.75
     assert result == 5328.75
+
+
+def test_store_manager(test_store):
+    test_store_manager = StoreManager()
+    assert test_store_manager
+
+
+def test_store_manager_store_exist(test_store):
+    test_store_manager = StoreManager()
+    test_store_manager._add_store("Test Store", test_store)
+    assert test_store_manager._is_store_name("Test Store")
+
+
+@patch(
+    "builtins.input",
+    side_effect=["TestStore_1", "TestStore_2"],
+)
+def test_add_two_stores(test_store, test_product_1, test_product_2):
+    test_store_manager = StoreManager()
+    test_store_1 = Store()
+    test_store_2 = Store()
+    test_store_1.add_product(test_product_1)
+    test_store_2.add_product(test_product_2)
+    test_store_manager._add_store("TestStore_1", test_store_1)
+    test_store_manager._add_store("TestStore_2", test_store_2)
+    combined_store_name = test_store_manager.add_two_stores()
+    combined_store = test_store_manager.stores[combined_store_name]
+    assert "TestStore_1" in test_store_manager.stores
+    assert "TestStore_2" in test_store_manager.stores
+    assert combined_store_name in test_store_manager.stores
+    expected_products = [test_product_1, test_product_2]
+    assert isinstance(combined_store, Store)
+    assert combined_store.products == expected_products

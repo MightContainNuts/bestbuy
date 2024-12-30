@@ -39,6 +39,42 @@ class Product:
         self._active = active
         self._promotions = promotions if promotions is not None else []
 
+    def __str__(self):
+        """
+        refactored in bonus step to use str instead of show method
+        :return:
+        :rtype:
+        """
+        promotion_text = self.create_promotion_text()
+        return (
+            f"{self.name.ljust(30)} - {str(self.price).ljust(6)} - {str(self.product_quantity).ljust(6)}\n"  # noqa E501
+            + promotion_text  # noqa E501
+        )
+
+    def __gt__(self, other):
+        """
+        bonus step add comparison gt and lt
+        :param other:
+        :type other:
+        :return:
+        :rtype:
+        """
+        if not isinstance(other, Product):
+            return NotImplemented
+        return self.price > other.price
+
+    def __lt__(self, other):
+        """
+        bonus step add comparison gt and lt
+        :param other:
+        :type other:
+        :return:
+        :rtype:
+        """
+        if not isinstance(other, Product):
+            return NotImplemented
+        return self.price < other.price
+
     @property
     def product_quantity(self) -> int:
         """
@@ -223,6 +259,18 @@ class NonStockedProducts(Product):
         super().__init__(name, price, active)
         self._quantity = 0
 
+    def __str__(self):
+        """
+        customized str override for show method
+        :return:
+        :rtype:
+        """
+        promotion_text = self.create_promotion_text()
+        return (
+            f"{self.name.ljust(30)} - {str(self.price).ljust(6)} - On Demand\n"
+            + promotion_text
+        )  # noqa E501
+
     def show(self) -> str:
         """
         show the product details
@@ -248,6 +296,18 @@ class LimitedProducts(Product):
     ) -> None:
         super().__init__(name, price, quantity, active)
         self.maximum = maximum
+
+    def __str__(self):
+        """
+        override str method
+        :return:
+        :rtype:
+        """
+        promotion_text = self.create_promotion_text()
+        return (
+            f"{self.name.ljust(30)} - {str(self.price).ljust(6)} - {str(self.product_quantity).ljust(6)}(Max per order:{self.maximum})\n"  # noqa E501
+            + promotion_text
+        )
 
     def show(self) -> str:
         """
